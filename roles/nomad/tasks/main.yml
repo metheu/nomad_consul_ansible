@@ -1,0 +1,52 @@
+---
+# tasks file for Mesos
+  - name: Install build tools
+    yum:
+      name: "{{ packages }}"
+
+  - name: Download nomad binary
+    get_url:
+      url: https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_linux_amd64.zip
+      dest: /tmp/nomad_{{ nomad_version }}_linux_amd64.zip
+      mode: 0644
+  
+  - name: Unzip nomad artifact
+    unarchive:
+      src: /tmp/nomad_{{ nomad_version }}_linux_amd64.zip
+      dest: /tmp/
+      remote_src: yes
+
+  - name: Check nomad binary exists
+    stat: path=/tmp/nomad
+    register: nomad_exists
+
+  - name: Move nomad to /usr/bin
+    command: mv /tmp/nomad /usr/bin/
+    when: nomad_exists.stat.exists
+  
+  - name: Copy nomad server.hcl to /opt/
+    template:
+      src: server.hcl.j2
+      dest: "{{ server_conf_path }}{{ server_conf_name }}"
+      owner: root
+      group: root
+      mode: 0600
+    notify:
+      restart nomad
+  
+  - name: Copy nomad service to /etc/systemd/system
+    template:
+      src: nomad_service.j2
+      dest: "/etc/systemd/system/nomad.service"
+      owner: root
+      group: root
+      mode: 0600
+    notify:
+      systemd reload
+
+  
+  - name: Start nomad service and enable it
+    systemd:
+      state: started
+      name: nomad
+

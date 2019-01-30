@@ -1,0 +1,12 @@
+---
+# defaults file for Mesos
+packages:
+  - zip
+  - unzip
+
+#
+# Server template
+#
+server_conf_name: server.hcl
+server_conf_path: /opt/
+server_dir : "/tmp/server1"
