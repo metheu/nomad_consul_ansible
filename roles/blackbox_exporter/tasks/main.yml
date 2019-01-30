@@ -18,6 +18,7 @@
     dest: /tmp/
     owner: "{{ blackbox_user }}"
     mode: 0644
+    remote_src: yes
 
 - name: Move blackbox exporter binary
   command: mv /tmp/blackbox_exporter-{{ blackbox_version }}.linux-amd64/blackbox_exporter /usr/local/bin/blackbox_exporter
