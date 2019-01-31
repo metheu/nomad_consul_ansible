@@ -2,3 +2,5 @@
 # defaults file for blackbox_exporter
 blackbox_version: 0.13.0
 blackbox_user: blackbox_exporter
+path_to_config: /etc/blackbox/
+path_blackbox_binary: /usr/local/bin/
