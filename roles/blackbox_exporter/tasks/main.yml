@@ -10,14 +10,14 @@
   get_url:
     url: https://github.com/prometheus/blackbox_exporter/releases/download/v{{ blackbox_version }}/blackbox_exporter-{{ blackbox_version }}.linux-amd64.tar.gz
     dest: /tmp/blackbox_exporter-{{ blackbox_version }}.linux-amd64.tar.gz
-    mode: 0644    
+    mode: 0771  
 
 - name: Untar the blackbox artifact
   unarchive:
     src: /tmp/blackbox_exporter-{{ blackbox_version }}.linux-amd64.tar.gz
     dest: /tmp/
     owner: "{{ blackbox_user }}"
-    mode: 0644
+    mode: 0771
     remote_src: yes
 
 - name: Move blackbox exporter binary
@@ -25,7 +25,29 @@
 
 - name: Own the binary to user
   file:
-    path: /usr/local/bin/blackbox_exporter
+    path: '{{ path_blackbox_binary }}blackbox_exporter'
     owner: "{{ blackbox_user }}"
+
+-   name: Copy systemd unit over
+    template:
+        src: blackbox_exporter.service.j2
+        dest: "/etc/systemd/system/blackbox_exporter.service"
+    notify: systemd reload
+
+-   name: Create blackbox conf dir
+    file:
+        path: "{{ path_to_config }}"
+        state: directory
+        owner: "{{ blackbox_user }}"
+        group: "{{ blackbox_user }}"
+
+- name: Copy blackbox configuration.
+  template:
+    src: blackbox.yml.j2
+    dest: "{{ path_to_config }}blackbox.yml"
+    owner: "{{ blackbox_user }}"
+    group: "{{ blackbox_user }}"
+    mode: 0771
+  notify: restart blackbox
 
    
