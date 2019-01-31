@@ -1,0 +1,13 @@
+[Unit]
+Description=Blackbox Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User={{blackbox_user}}
+Group={{blackbox_user}}
+Type=simple
+ExecStart={{path_blackbox_binary}}blackbox_exporter --config.file {{ path_to_config }}blackbox.yml
+
+[Install]
+WantedBy=multi-user.target
