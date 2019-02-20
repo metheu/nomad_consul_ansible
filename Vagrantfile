@@ -55,8 +55,7 @@ Vagrant.configure("2") do |config|
   #   vb.gui = true
   #
   #   # Customize the amount of memory on the VM:
-    vb.memory = "2048"
-    vb.cpus = "2"
+    vb.memory = "1048"
   end
   #
   # View the documentation for the provider you are using for more
@@ -72,4 +71,46 @@ Vagrant.configure("2") do |config|
   echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDTeutXeah1PJKTwsVJXpXSOhsYCYSJ/FHOlN7i6QxAwM8lxbK4vTlJ/iIiIyioqaht4xjEoy5ued15hNJo699aRV2GQzQO7b8LEDCmEOVykN+j2sqFEbTjm9yTC35tFbpY30Nnpirzcq6XGdmy7ZbTx252ISssuMoOgnjWegXVGw+sD4wno6aw+ICElB0QTZQCW4H2/Bf+fRbWHbIcVH2Wu3OYk/tonWG9A5ejph7lBdkk+sAmdlnrlKlHn3Rl2WPoWnJH48vqzobQE92nwVzB3sUcIIcpm1pFWeJqSNbLJMWynXf5qGRdOV1iFwI/9EGq/cbp/L6E0OBJkSn6P6F/ matt@localhost.localdomain" >> /home/vagrant/.ssh/authorized_keys
   sudo systemctl restart sshd.service
   SHELL
+
+  config.vm.define "master" do |m|
+    m.vm.box = "bento/centos-7.5"
+    m.vm.hostname = 'master'
+    
+  
+    m.vm.network :"public_network", bridge: "wlp1s0", ip: "192.168.1.200"
+  
+    m.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 1024]
+      v.customize ["modifyvm", :id, "--name", "master"]
+    end
+  end
+
+  config.vm.define "slave1" do |slave1|
+    slave1.vm.box = "bento/centos-7.5"
+    slave1.vm.hostname = 'slave1'
+    
+  
+    slave1.vm.network :"public_network", bridge: "wlp1s0", ip: "192.168.1.201"
+  
+    slave1.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--name", "slave1"]
+    end
+  end
+
+  config.vm.define "slave2" do |slave2|
+    slave2.vm.box = "bento/centos-7.5"
+    slave2.vm.hostname = 'slave2'
+    
+  
+    slave2.vm.network :"public_network", bridge: "wlp1s0", ip: "192.168.1.202"
+  
+    slave2.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--name", "slave2"]
+    end
+  end
+
 end
+
+
