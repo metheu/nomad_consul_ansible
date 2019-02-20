@@ -1,0 +1,13 @@
+[Unit]
+Description=Blackbox Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User={{nodeEx_user}}
+Group={{nodeEx_user}}
+Type=simple
+ExecStart={{path_node_binary}}node_exporter 
+
+[Install]
+WantedBy=multi-user.target

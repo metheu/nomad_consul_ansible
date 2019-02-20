@@ -1,0 +1,45 @@
+---
+# tasks file for blackbox_exporter
+- name: Setup node exporter user
+  user:
+    name: "{{ nodeEx_user }}"
+    shell: /bin/false
+    create_home: false
+
+- name: Download the node expoter binary
+  get_url:
+    url: https://github.com/prometheus/node_exporter/releases/download/v{{ nodeEx_version }}/node_exporter-{{ nodeEx_version }}.linux-amd64.tar.gz
+    dest: /tmp/node_exporter-{{ nodeEx_version }}.linux-amd64.tar.gz
+    mode: 0771  
+
+- name: Untar the node expoter artifact
+  unarchive:
+    src: /tmp/node_exporter-{{ nodeEx_version }}.linux-amd64.tar.gz
+    dest: /tmp/
+    owner: "{{ nodeEx_user }}"
+    mode: 0771
+    remote_src: yes
+
+- name: Move node exporter binary
+  command: mv /tmp/node_exporter-{{ nodeEx_version }}.linux-amd64/node_exporter /usr/local/bin/node_exporter
+
+- name: Own the binary to user
+  file:
+    path: '{{ path_node_binary }}node_exporter'
+    owner: "{{ nodeEx_user }}"
+
+-   name: Copy systemd unit over
+    template:
+        src: node_exporter.service.j2
+        dest: "/etc/systemd/system/node_exporter.service"
+    notify: systemd reload
+
+-   name: make sure node explorer its up and enabled
+    systemd:
+        name: node_exporter
+        state: started
+        enabled: yes
+
+
+
+   

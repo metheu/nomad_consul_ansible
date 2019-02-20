@@ -1,0 +1,10 @@
+---
+# handlers file for blackbox_exporter
+- name: systemd reload
+  systemd:
+    daemon_reload: yes
+
+- name: restart blackbox
+  systemd:
+    state: restarted
+    name: blackbox_exporter

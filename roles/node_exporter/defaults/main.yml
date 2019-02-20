@@ -1,0 +1,6 @@
+---
+# defaults file for blackbox_exporter
+nodeEx_version: 0.17.0
+nodeEx_user: node_exporter
+path_to_config: /etc/node_exporter/
+path_node_binary: /usr/local/bin/
