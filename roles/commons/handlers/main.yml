@@ -1,0 +1,5 @@
+---
+# handlers file for commons
+- name: restart syslog
+  become: yes
+  service: name=rsyslog state=restarted

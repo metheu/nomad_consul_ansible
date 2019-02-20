@@ -1,0 +1,10 @@
+---
+# tasks file for commons
+- name: add udp syslog address for garylog
+  become: yes
+  lineinfile:
+      path: /etc/rsyslog.d/graylog.conf
+      create: yes
+      line: "*.* @{{ garylog_ip }}:514;RSYSLOG_SyslogProtocol23Format"
+  notify: restart syslog
+
