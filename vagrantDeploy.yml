@@ -1,13 +1,11 @@
 - hosts:
-  - nomad_master
   - slaves
-  become: yes
+
   remote_user: vagrant
-  gather_facts: no
   pre_tasks:
   - name: 'install python2'
     raw: sudo yum -y install python
+    
   roles:
-  - roles/commons
-  - roles/nomad
-  - roles/consul
+  - roles/docker
+  
