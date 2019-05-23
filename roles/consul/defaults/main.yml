@@ -1,5 +1,10 @@
 ---
 # defaults file for consul
-consul_user: cosul
-consul_version: 1.4.2
+packages:
+  - zip
+  - unzip
+consul_user: consul
+consul_version: 1.4.4
+consul_data_dir: "/var/consul"
+consul_keygen: vXETrCP9r+k1jq64Omn2ig==
       

@@ -1,10 +1,17 @@
 ---
 # tasks file for consul
+
+  - name: DEBUG
+    debug:
+      var: ansible_facts
+
   - name: Install build tools
+    become: yes
     yum:
       name: "{{ packages }}"
 
   - name: Setup consul user
+    become: yes
     user:
       name: "{{ consul_user }}"
       shell: /bin/false
@@ -24,33 +31,60 @@
 
   - name: Check consul binary exists
     stat: path=/tmp/consul
-    register: consul_exists
+   
 
-  - name: Move consul to /usr/bin
-    command: mv /tmp/consul /usr/bin/
-    when: consul_exists.stat.exists
-  
-  # - name: Copy consul server.hcl to /opt/
-  #   template:
-  #     src: server.hcl.j2
-  #     dest: "{{ server_conf_path }}{{ server_conf_name }}"
-  #     owner: "{{ consul_user }}"
-  #     group: "{{ consul_user }}"
-  #     mode: 0600
-  #   notify:
-  #     restart consul
-  
-  # - name: Copy consul service to /etc/systemd/system
-  #   template:
-  #     src: consul_service.j2
-  #     dest: "/etc/systemd/system/consul.service"
-  #     owner: "{{ consul_user }}"
-  #     group: "{{ consul_user }}"
-  #     mode: 0600
-  #   notify:
-  #     systemd reload
+  - name: Copy consul binary to bin dir
+    become: yes
+    copy:
+      src: /tmp/consul
+      dest: /usr/bin/
+      owner: "{{ consul_user }}"
+      group: "{{ consul_user }}"
+      # Dont forget to change below to 0644
+      mode: 0755
+      remote_src: yes
+    
+  - name: create config directories for consul
+    become: yes
+    file:
+      path: /etc/consul.d
+      state: directory
+      owner: "{{ consul_user }}"
+      group: "{{ consul_user }}"
+      mode: 0755
 
-  # - name: Start consul service and enable it
-  #   systemd:
-  #     state: started
-  #     name: consul
+  - name: Create data dir for consul
+    become: yes
+    file:
+      path: "{{ consul_data_dir }}"
+      state: directory
+      owner: "{{ consul_user }}"
+      group: "{{ consul_user }}"
+
+  - name: Copy consul server config
+    become: yes
+    template:
+      src: server_config.j2
+      dest: "/etc/consul.d/server_config.json"
+      owner: "{{ consul_user }}"
+      group: "{{ consul_user }}"
+      mode: 0755
+    notify:
+      restart_consul
+  
+  - name: Copy consul service to /etc/systemd/system
+    become: yes
+    template:
+      src: consul_service.j2
+      dest: "/etc/systemd/system/consul.service"
+      owner: "{{ consul_user }}"
+      group: "{{ consul_user }}"
+    notify:
+      systemd_reload
+
+  - name: Start consul service and enable it
+    become: yes
+    systemd:
+      name: consul
+      state: started
+      enabled: yes

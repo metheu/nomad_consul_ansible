@@ -1,19 +1,31 @@
+
 # Increase log verbosity
 log_level = "DEBUG"
 
+datacenter = "saburtalo"
+
 # Setup data dir
 data_dir = "{{ server_dir }}"
+bind_addr = "0.0.0.0"
+
+advertise {
+  # We need to specify our host's IP because we can't
+  # advertise 0.0.0.0 to other nodes in our cluster.
+  http =  "{{   ansible_facts['eth1']['ipv4']['address']  }}:4646"
+  rpc =   "{{  ansible_facts['eth1']['ipv4']['address']  }}:4647"
+  serf =  "{{   ansible_facts['eth1']['ipv4']['address']  }}:4648"
+}
 
 # Enable the server
 server {
     enabled = true
 
     # Self-elect, should be 3 or 5 for production
-    bootstrap_expect = 1
+    bootstrap_expect = 3
 }
 
 # Give the agent a unique name. Defaults to hostname
-name = "client1"
+name = "{{ ansible_hostname }}"
 
 # Enable the client
 client {
@@ -22,5 +34,15 @@ client {
     # For demo assume we are talking to server1. For production,
     # this should be like "nomad.service.consul:4647" and a system
     # like Consul used for service discovery.
-    servers = ["127.0.0.1:4647"]
+    servers = ["0.0.0.0:4647"]
 }
+
+consul {
+  address             = "0.0.0.0:8500"
+  checks_use_advertise = true
+  server_service_name = "nomad-server"
+  client_service_name = "nomad-client"
+  server_auto_join    = true
+  client_auto_join    = true
+}
+

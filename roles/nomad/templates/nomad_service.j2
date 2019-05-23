@@ -6,7 +6,7 @@ Description=Nomad Agent
 [Service]
 Restart=on-failure
 EnvironmentFile={{ server_conf_path }}{{ server_conf_name }}
-ExecStart=/usr/bin/nomad agent -config {{ server_conf_path }} $FLAGS
+ExecStart=/usr/bin/nomad agent -config {{ server_conf_path }}{{ server_conf_name }} $FLAGS
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGTERM
 User=root

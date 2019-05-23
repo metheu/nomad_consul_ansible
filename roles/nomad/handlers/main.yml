@@ -1,10 +1,10 @@
 ---
 # handlers file for nomad
-- name: systemd reload
-  systemd:
-    daemon_reload: yes
+-   name: systemd_reload
+    become: yes
+    systemd:
+        name: nomad
+        state: restarted
+        daemon_reload: yes
 
-- name: restart nomad
-  systemd:
-    state: restarted
-    name: nomad
+

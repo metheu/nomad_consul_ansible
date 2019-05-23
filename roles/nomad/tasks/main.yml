@@ -23,10 +23,12 @@
     register: nomad_exists
 
   - name: Move nomad to /usr/bin
+    become: yes
     command: mv /tmp/nomad /usr/bin/
     when: nomad_exists.stat.exists
   
   - name: Copy nomad server.hcl to /opt/
+    become: yes
     template:
       src: server.hcl.j2
       dest: "{{ server_conf_path }}{{ server_conf_name }}"
@@ -34,9 +36,10 @@
       group: root
       mode: 0600
     notify:
-      restart nomad
+      systemd_reload
   
   - name: Copy nomad service to /etc/systemd/system
+    become: yes
     template:
       src: nomad_service.j2
       dest: "/etc/systemd/system/nomad.service"
@@ -44,11 +47,12 @@
       group: root
       mode: 0600
     notify:
-      systemd reload
+      systemd_reload
 
-  
   - name: Start nomad service and enable it
+    become: yes
     systemd:
       state: started
       name: nomad
+      enabled: yes
 
